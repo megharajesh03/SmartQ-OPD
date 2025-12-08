@@ -1,56 +1,44 @@
 package com.example.demo.bean;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
-@Table(name = "users")  // Ensure it uses the correct table name
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment for the ID
-    private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String username;  // Unique username for each user
+    private String id;
 
     @Column(nullable = false)
-    private String password;  // Store password (preferably encrypted)
+    private String password;
 
     @Column(nullable = false)
-    private String role;  // Roles like ADMIN, DOCTOR, USER
-    
-    // Optional: you can add more fields such as full name, contact, etc.
-    private String fullName;
-    private String email;
-    private String phone;
+    private boolean loginStatus = false;  // Default value is false
 
-    // --- Constructors ---
-    
+    @Column(nullable = false)
+    private String accountType;  // Values can be 'A' for Admin, 'U' for User, and 'D' for Doctor
+
+    // Constructors, Getters, and Setters
+
     public User() {
-        // Default constructor (for JPA)
     }
 
-    public User(String username, String password, String role) {
-        this.username = username;
+    public User(String id, String password, boolean loginStatus, String accountType) {
+        this.id = id;
         this.password = password;
-        this.role = role;
+        this.loginStatus = loginStatus;
+        this.accountType = accountType;
     }
 
-    // --- Getters and Setters ---
+    // Getters and Setters
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -61,35 +49,28 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public boolean isLoginStatus() {
+        return loginStatus;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setLoginStatus(boolean loginStatus) {
+        this.loginStatus = loginStatus;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getAccountType() {
+        return accountType;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setAccountType(String accountType) {
+        // You can add validation here if you like
+        if (!accountType.equals("A") && !accountType.equals("P") && !accountType.equals("D")) {
+            throw new IllegalArgumentException("Invalid account type. Must be 'A', 'P', or 'D'.");
+        }
+        this.accountType = accountType;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    @Override
+    public String toString() {
+        return "User{id='" + id + "', password='" + password + "', loginStatus=" + loginStatus + ", accountType='" + accountType + "'}";
     }
 }

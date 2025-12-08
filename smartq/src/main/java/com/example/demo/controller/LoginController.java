@@ -32,7 +32,7 @@ public class LoginController {
         }
 
         // Redirect based on ROLE
-        switch (user.getRole().toUpperCase()) {
+        switch (user.getAccountType().toUpperCase()) {
             case "ADMIN":
                 return "redirect:/admin/home";
             case "DOCTOR":
