@@ -24,9 +24,9 @@ public class UserService {
             case "ADMIN":
                 user = adminRepo.findByUsername(username);
                 break;
-            case "DOCTOR":
-                user = doctorRepo.findByUsername(username);
-                break;
+//            case "DOCTOR":
+//                user = doctorRepo.findByUsername(username);
+//                break;
             case "USER":
                 user = userRepo.findByUsername(username);
                 break;

@@ -25,8 +25,12 @@ public class Doctor {
     private String email;
 
     private String phone;
+    @Column(nullable = false)
+    private String password;
 
-    @Enumerated(EnumType.STRING)
+ 
+
+	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
@@ -93,6 +97,14 @@ public class Doctor {
 		this.status = status;
 	}
 
+	 public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	 @Override
 	 public String toString() {
 		 return "Doctor{id=" + id + ", name='" + name + "', specialization='" + specialization + "', email='" + email + "', phone='" + phone + "', status=" + status + "}";
@@ -100,8 +112,8 @@ public class Doctor {
 	
 	// Enum to represent the consultation status
     public enum Status {
-        PENDING,
-        IN_CONSULTATION,
-        DONE
+        AVAILABLE,NOT_AVAILABLE
     }
+
+	
 }
