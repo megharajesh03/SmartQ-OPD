@@ -18,7 +18,7 @@ public class DoctorController {
     // Show the Doctor Login page
     @GetMapping("/doctorlogin")
     public String showDoctorLoginPage() {
-        return "doctorlogin";  // Shows doctorlogin.jsp page
+        return "doctorlogin";  
     }
 
     // Handle Doctor Login form submission
@@ -27,7 +27,7 @@ public class DoctorController {
                                     @RequestParam String password,
                                     Model model) {
 
-        // Validate doctor credentials for doctor role (you can adjust your method to check roles)
+        // Validate doctor credentials for doctor role
         Doctor doctor = doctorService.validateDoctor(username, password);
 
         if (doctor == null) {
@@ -37,7 +37,8 @@ public class DoctorController {
         }
 
         // If login is successful, redirect to doctor home page
-        return "redirect:/doctor/doctorhome";  // Redirect to doctor home page
+        // Include doctorId in the redirect URL
+        return "redirect:/doctor/doctorhome?doctorId=" + doctor.getId();
     }
 
     // Doctor home page
@@ -45,21 +46,25 @@ public class DoctorController {
     public String doctorHome(@RequestParam Long doctorId, Model model) {
         // Get the doctor by ID to show their current status and details
         Doctor doctor = doctorService.getDoctorById(doctorId);
+        
+        // Add the doctor object to the model
         model.addAttribute("doctor", doctor);
-        return "doctorhome";  // maps to /WEB-INF/views/doctor/doctor_home.jsp
+        return "doctorhome";  
     }
 
     // Mark doctor as available
     @PostMapping("/markAvailable")
     public String markAvailable(@RequestParam Long doctorId) {
         doctorService.setDoctorStatus(doctorId, Doctor.Status.AVAILABLE);
-        return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  // Redirect back to doctor home page
+        // Redirect back to doctor home page with doctorId as a query parameter
+        return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  
     }
 
     // Mark doctor as not available
     @PostMapping("/markNotAvailable")
     public String markNotAvailable(@RequestParam Long doctorId) {
         doctorService.setDoctorStatus(doctorId, Doctor.Status.NOT_AVAILABLE);
-        return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  // Redirect back to doctor home page
+        // Redirect back to doctor home page with doctorId as a query parameter
+        return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  
     }
 }

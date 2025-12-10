@@ -27,23 +27,6 @@ public class LoginController {
         return "adminlogin";  // will show adminlogin.html
     }
 
-    // Handle Admin login
-    @PostMapping("/adminlogin")
-    public String adminLogin(@RequestParam String username,
-                             @RequestParam String password,
-                             RedirectAttributes redirectAttributes) {
-
-        User user = userService.validateUser(username, password, "ADMIN");
-
-        // If login fails, show error message and stay on login page
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "Invalid Username or Password");
-            return "redirect:/adminlogin";  // Redirect back to admin login page
-        }
-
-        // Successful login, redirect to admin home page
-        return "redirect:/adminhome";
-    }
 
     // Doctor login page
     @GetMapping("/doctorlogin")
@@ -51,23 +34,23 @@ public class LoginController {
         return "doctorlogin";  // will show doctorlogin.html
     }
 
-    // Handle Doctor login
-    @PostMapping("/doctorlogin")
-    public String doctorLogin(@RequestParam String username,
-                              @RequestParam String password,
-                              RedirectAttributes redirectAttributes) {
-
-        User user = userService.validateUser(username, password, "DOCTOR");
-
-        // If login fails, show error message and stay on login page
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "Invalid Username or Password");
-            return "redirect:/doctorlogin";  // Redirect back to doctor login page
-        }
-
-        // Successful login, redirect to doctor home page
-        return "redirect:/doctorhome";
-    }
+//    // Handle Doctor login
+//    @PostMapping("/doctorlogin")
+//    public String doctorLogin(@RequestParam String username,
+//                              @RequestParam String password,
+//                              RedirectAttributes redirectAttributes) {
+//
+//        User user = userService.validateUser(username, password, "DOCTOR");
+//
+//        // If login fails, show error message and stay on login page
+//        if (user == null) {
+//            redirectAttributes.addFlashAttribute("error", "Invalid Username or Password");
+//            return "redirect:/doctorlogin";  // Redirect back to doctor login page
+//        }
+//
+//        // Successful login, redirect to doctor home page
+//        return "redirect:/doctorhome";
+//    }
 
     // User login page
     @GetMapping("/userlogin")
