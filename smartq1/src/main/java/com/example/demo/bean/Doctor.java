@@ -7,8 +7,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "doctor")
 public class Doctor {
 
     @Id
@@ -16,7 +18,7 @@ public class Doctor {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String username;
 
     @Column(nullable = false)
     private String specialization;
@@ -28,92 +30,100 @@ public class Doctor {
     @Column(nullable = false)
     private String password;
 
- 
+	
 
-	@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-
-    // Constructors, Getters, and Setters
-
-    public Doctor() {
-    }
-
-    public Doctor(String name, String specialization, String email, String phone, Status status) {
-        this.name = name;
-        this.specialization = specialization;
-        this.email = email;
-        this.phone = phone;
-        this.status = status;
-    }
-
-    // Getters and Setters
-   
-    public Long getId() {
+	public Long getId() {
 		return id;
 	}
+
+
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+
+
+	public String getUsername() {
+		return username;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
+
+
 
 	public String getSpecialization() {
 		return specialization;
 	}
 
+
+
 	public void setSpecialization(String specialization) {
 		this.specialization = specialization;
 	}
+
+
 
 	public String getEmail() {
 		return email;
 	}
 
+
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+
 
 	public String getPhone() {
 		return phone;
 	}
 
+
+
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
-	public Status getStatus() {
-		return status;
-	}
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
 
-	 public String getPassword() {
+	public String getPassword() {
 		return password;
 	}
+
+
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	 @Override
-	 public String toString() {
-		 return "Doctor{id=" + id + ", name='" + name + "', specialization='" + specialization + "', email='" + email + "', phone='" + phone + "', status=" + status + "}";
-	 }
-	
+
+
+	public Status getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+
+
 	// Enum to represent the consultation status
     public enum Status {
         AVAILABLE,NOT_AVAILABLE
     }
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
 
 	
 }

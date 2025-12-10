@@ -1,6 +1,5 @@
 package com.example.demo.bean;
 
-
 import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
@@ -24,9 +23,10 @@ public class ConsultationQueue {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;  // Foreign Key to Doctor
 
+    // Change the foreign key column name from 'id' to 'user_id' to avoid conflict
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
-    private User user;  // Foreign Key to Patient
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;  // Foreign Key to User
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,7 +64,7 @@ public class ConsultationQueue {
         this.doctor = doctor;
     }
 
-    public User getPatient() {
+    public User getUser() {
         return user;
     }
 

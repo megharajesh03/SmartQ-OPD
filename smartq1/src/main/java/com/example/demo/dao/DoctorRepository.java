@@ -7,5 +7,5 @@ import com.example.demo.bean.User;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    Doctor findByUsername(String username);
+	Doctor findByUsername(String username);
 }

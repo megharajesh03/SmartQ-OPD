@@ -1,8 +1,6 @@
 package com.example.demo.bean;
 
-
 import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,9 +16,10 @@ public class Insurance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // AUTO_INCREMENT behavior in SQL
     private Long id;
 
+    // Changed the column name for the foreign key to avoid duplication of 'id'
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
-    private User user;  // Foreign Key to Patient
+    @JoinColumn(name = "user_id", nullable = false)  // Use 'user_id' as the foreign key column
+    private User user;  // Foreign Key to User
 
     @Column(unique = true, nullable = false)
     private String insuranceNumber;
@@ -55,76 +54,76 @@ public class Insurance {
         this.status = status;
     }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public String getInsuranceNumber() {
-		return insuranceNumber;
-	}
+    public String getInsuranceNumber() {
+        return insuranceNumber;
+    }
 
-	public void setInsuranceNumber(String insuranceNumber) {
-		this.insuranceNumber = insuranceNumber;
-	}
+    public void setInsuranceNumber(String insuranceNumber) {
+        this.insuranceNumber = insuranceNumber;
+    }
 
-	public String getProviderName() {
-		return providerName;
-	}
+    public String getProviderName() {
+        return providerName;
+    }
 
-	public void setProviderName(String providerName) {
-		this.providerName = providerName;
-	}
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
 
-	public String getCoverageType() {
-		return coverageType;
-	}
+    public String getCoverageType() {
+        return coverageType;
+    }
 
-	public void setCoverageType(String coverageType) {
-		this.coverageType = coverageType;
-	}
+    public void setCoverageType(String coverageType) {
+        this.coverageType = coverageType;
+    }
 
-	public Date getValidityStart() {
-		return validityStart;
-	}
+    public Date getValidityStart() {
+        return validityStart;
+    }
 
-	public void setValidityStart(Date validityStart) {
-		this.validityStart = validityStart;
-	}
+    public void setValidityStart(Date validityStart) {
+        this.validityStart = validityStart;
+    }
 
-	public Date getValidityEnd() {
-		return validityEnd;
-	}
+    public Date getValidityEnd() {
+        return validityEnd;
+    }
 
-	public void setValidityEnd(Date validityEnd) {
-		this.validityEnd = validityEnd;
-	}
+    public void setValidityEnd(Date validityEnd) {
+        this.validityEnd = validityEnd;
+    }
 
-	public Double getPremiumAmount() {
-		return premiumAmount;
-	}
+    public Double getPremiumAmount() {
+        return premiumAmount;
+    }
 
-	public void setPremiumAmount(Double premiumAmount) {
-		this.premiumAmount = premiumAmount;
-	}
+    public void setPremiumAmount(Double premiumAmount) {
+        this.premiumAmount = premiumAmount;
+    }
 
-	public boolean isStatus() {
-		return status;
-	}
+    public boolean isStatus() {
+        return status;
+    }
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
 }
