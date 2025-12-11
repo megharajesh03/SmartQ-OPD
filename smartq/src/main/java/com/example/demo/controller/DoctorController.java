@@ -5,8 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
+import com.example.demo.bean.ConsultationQueue;
 import com.example.demo.bean.Doctor;
 import com.example.demo.service.DoctorService;
+import com.example.demo.service.QueueService;
 
 @Controller
 @RequestMapping("/doctor")
@@ -14,6 +16,9 @@ public class DoctorController {
 
     @Autowired
     private DoctorService doctorService;
+    
+    @Autowired
+    private QueueService queueService;
 
     // Show the Doctor Login page
     @GetMapping("/doctorlogin")
@@ -44,11 +49,23 @@ public class DoctorController {
     // Doctor home page
     @GetMapping("/doctorhome")
     public String doctorHome(@RequestParam Long doctorId, Model model) {
-        // Get the doctor by ID to show their current status and details
         Doctor doctor = doctorService.getDoctorById(doctorId);
-        
-        // Add the doctor object to the model
         model.addAttribute("doctor", doctor);
+        
+        // Add Stats
+        int waitingCount = queueService.getWaitingCount(doctorId);
+        int servedCount = queueService.getServedCount(doctorId);
+        
+        model.addAttribute("waitingCount", waitingCount);
+        model.addAttribute("servedCount", servedCount);
+        
+        // Get Current Patient details (if any)
+        ConsultationQueue currentPatientToken = queueService.getCurrentPatient(doctorId);
+        if(currentPatientToken != null) {
+            model.addAttribute("currentPatient", currentPatientToken.getUser());
+            model.addAttribute("currentToken", currentPatientToken.getTokenNumber());
+        }
+        
         return "doctorhome";  
     }
 
@@ -91,5 +108,17 @@ public class DoctorController {
 
         // Redirect back to the doctor home page with the ID to maintain session/context
         return "redirect:/doctor/doctorhome?doctorId=" + doctor.getId();
+    }
+    
+ // ACTION: Call Next Patient
+    @PostMapping("/callNext")
+    public String callNextPatient(@RequestParam Long doctorId) {
+        // 1. QueueService moves the line (Marks current DONE, next IN_CONSULTATION)
+        queueService.callNextPatient(doctorId);
+        
+        // 2. Ensure Doctor status is AVAILABLE
+        doctorService.setDoctorStatus(doctorId, Doctor.Status.AVAILABLE);
+        
+        return "redirect:/doctor/doctorhome?doctorId=" + doctorId;
     }
 }
