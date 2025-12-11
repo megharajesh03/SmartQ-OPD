@@ -67,4 +67,29 @@ public class DoctorController {
         // Redirect back to doctor home page with doctorId as a query parameter
         return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  
     }
+    
+    @GetMapping("/editprofile")
+    public String showEditProfilePage(@RequestParam Long doctorId, Model model) {
+        // Fetch the existing doctor details to pre-fill the form
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        
+        if (doctor != null) {
+            model.addAttribute("doctor", doctor);
+            return "doctor_edit_profile"; // You need to create this JSP/HTML file
+        }
+        
+        // Fallback if ID is invalid
+        return "redirect:/doctor/doctorlogin";
+    }
+
+    // 2. Handle the Profile Update form submission
+    @PostMapping("/updateprofile")
+    public String updateProfile(@ModelAttribute Doctor doctor) {
+        // Call service to update the doctor's details
+        // Note: Ensure your form includes a hidden input for 'id' so it knows which doctor to update
+        doctorService.updateDoctor(doctor);
+
+        // Redirect back to the doctor home page with the ID to maintain session/context
+        return "redirect:/doctor/doctorhome?doctorId=" + doctor.getId();
+    }
 }

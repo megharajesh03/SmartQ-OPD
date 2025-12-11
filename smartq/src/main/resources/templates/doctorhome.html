@@ -180,7 +180,7 @@
             </a>
             <div class="d-flex align-items-center">
                 <span class="me-3 text-secondary d-none d-md-block">Dr. <span th:text="${doctor.username}">Smith</span></span>
-                <a href="/doctorlogin" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <a href="/doctor/doctorlogin" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                     <i class="fas fa-sign-out-alt me-1"></i> Logout
                 </a>
             </div>
@@ -225,7 +225,7 @@
                     </div>
 
                     <div class="text-center mt-3">
-                         <a href="#" class="text-secondary small text-decoration-none">
+                        <a th:href="@{/doctor/editprofile(doctorId=${doctor.id})}" class="text-secondary small text-decoration-none">
                             <i class="fas fa-cog me-1"></i> Edit Profile
                          </a>
                     </div>
