@@ -49,14 +49,7 @@ public class AdminController {
     @GetMapping("/doctorlist")
     public String viewAllDoctors(Model model) {
         Iterable<Doctor> doctors = adminService.getAllDoctors();
-        
-        // Debugging: Log doctors' data
-        if (doctors != null) {
-            doctors.forEach(doctor -> System.out.println("Doctor fetched: " + doctor.getUsername()));
-        } else {
-            System.out.println("No doctors found.");
-        }
-
+   
         // Add the doctors list to the model
         model.addAttribute("doctors", doctors);
 
