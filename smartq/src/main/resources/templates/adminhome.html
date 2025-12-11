@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SmartQ</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary-bg: #f0fdfa;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-bg);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Dashboard Content */
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: var(--text-light);
+        }
+
+        /* Stats Cards (Optional visual flair) */
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .stat-info p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Action Grid */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-card:hover {
+            border-color: var(--primary-color);
+            background: var(--secondary-bg);
+            transform: translateY(-5px);
+            color: var(--primary-dark);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .action-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .action-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        /* Danger/Logout Button */
+        .logout-btn {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat me-2"></i>SmartQ Admin
+            </a>
+            <div class="user-profile">
+                <div class="admin-avatar">A</div>
+                <div class="d-none d-sm-block">
+                    <small class="d-block text-secondary" style="font-size: 0.75rem;">Logged in as</small>
+                    <span class="fw-bold">Administrator</span>
+                </div>
+                <a href="#" onclick="confirmLogout()" class="logout-btn ms-3">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container" style="margin-top: 80px;">
+        
+        <div class="page-header">
+            <h2>Dashboard Overview</h2>
+            <p>Welcome back! Here is what's happening at SmartQ today.</p>
+        </div>
+
+        <div class="row mb-4">
+            <!--<div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>12</h3> 
+                        <p>Doctors</p>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+                        <i class="fas fa-procedures"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>45</h3>
+                        <p>Patients</p>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fef9c3; color: #ca8a04;">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>8</h3>
+                        <p>Appointments</p>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fae8ff; color: #9333ea;">
+                        <i class="fas fa-file-medical-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>5</h3>
+                        <p>Pending Reports</p>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+
+        <hr class="text-secondary opacity-25 my-4">
+
+        <div class="section-title">Doctor Management</div>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <a th:href="@{/admin/adddoctor}" href="/admin/adddoctor" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="action-title">Add Doctor</div>
+                    <div class="action-desc">Onboard new medical staff</div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a th:href="@{/admin/doctorlist}" href="/admin/doctorlist" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="action-title">View Doctors</div>
+                    <div class="action-desc">Manage existing doctor profiles</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="section-title">System & Operations</div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <a th:href="@{/admin/manage-users}" href="/admin/manage-users" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="action-title">Manage Users</div>
+                    <div class="action-desc">Patient accounts & permissions</div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a th:href="@{/admin/appointments}" href="/admin/appointments" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="action-title">Appointments</div>
+                    <div class="action-desc">Check queue and schedules</div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a th:href="@{/admin/view-reports}" href="/admin/view-reports" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="action-title">View Reports</div>
+                    <div class="action-desc">Hospital analytics and logs</div>
+                </a>
+            </div>
+        </div>
+
+    
+	
+		</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmLogout() {
+            if(confirm("Are you sure you want to log out?")) {
+                window.location.href = '/adminlogin'; 
+            }
+        }
+    </script>
+</body>
+</html>

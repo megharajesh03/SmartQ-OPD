@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | SmartQ</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary-bg: #f0fdfa;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .doctor-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--secondary-bg);
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            margin-right: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Status Section */
+        .status-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background-color: #dcfce7;
+            border: 2px solid #22c55e;
+            color: #15803d;
+        }
+
+        .status-inactive {
+            background-color: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #b91c1c;
+        }
+
+        /* Action Buttons */
+        .btn-status-toggle {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 300px;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-go-online {
+            background: var(--primary-color);
+            color: white;
+        }
+        .btn-go-online:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .btn-go-offline {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-go-offline:hover { background: #dc2626; transform: translateY(-2px); }
+
+        /* Stats Grid */
+        .stat-box {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logout-link {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .logout-link:hover { background: #fee2e2; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-hospital-user me-2"></i>SmartQ OPD
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="me-3 text-secondary d-none d-md-block">Dr. <span th:text="${doctor.username}">Smith</span></span>
+                <a href="/doctorlogin" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px; margin-bottom: 50px;">
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 style="color: var(--text-dark); font-weight: 700;">Dashboard</h2>
+                <p class="text-secondary">Manage your availability and view your queue status.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="dashboard-card">
+                    <div class="profile-header">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h4 th:text="${doctor.username}">Dr. Name</h4>
+                        <span class="badge bg-light text-dark border" th:text="${doctor.specialization}">Specialization</span>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <small class="text-muted d-block">Email</small>
+                            <span class="fw-medium" th:text="${doctor.email}">doctor@test.com</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <small class="text-muted d-block">Phone</small>
+                            <span class="fw-medium" th:text="${doctor.phone}">+123456789</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                         <a href="#" class="text-secondary small text-decoration-none">
+                            <i class="fas fa-cog me-1"></i> Edit Profile
+                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                
+                <div class="dashboard-card status-card mb-4" 
+                     th:classappend="${doctor.status != null and (doctor.status.toString() == 'AVAILABLE' or doctor.status.toString() == 'Available')} ? 'status-active' : 'status-inactive'">
+                    
+                    <div th:if="${doctor.status != null and (doctor.status.toString() == 'AVAILABLE' or doctor.status.toString() == 'Available')}">
+                        <div class="mb-3">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h3>You are Online</h3>
+                            <p>Patients can currently see you in the OPD list.</p>
+                        </div>
+                        <form action="/doctor/markNotAvailable" method="post">
+                            <input type="hidden" name="doctorId" th:value="${doctor.id}">
+                            <button type="submit" class="btn-status-toggle btn-go-offline">
+                                <i class="fas fa-power-off me-2"></i> Go Offline / Break
+                            </button>
+                        </form>
+                    </div>
+
+                    <div th:unless="${doctor.status != null and (doctor.status.toString() == 'AVAILABLE' or doctor.status.toString() == 'Available')}">
+                        <div class="mb-3">
+                            <i class="fas fa-moon fa-3x text-danger mb-3"></i>
+                            <h3>You are Offline</h3>
+                            <p>You are not visible in the patient queue.</p>
+                        </div>
+                        <form action="/doctor/markAvailable" method="post">
+                            <input type="hidden" name="doctorId" th:value="${doctor.id}">
+                            <button type="submit" class="btn-status-toggle btn-go-online">
+                                <i class="fas fa-play me-2"></i> Start OPD Session
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="dashboard-card py-3">
+                            <div class="d-flex align-items-center justify-content-center flex-column">
+                                <span class="text-muted mb-2">Patients in Queue</span>
+                                <h2 class="text-primary mb-0">0</h2> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="dashboard-card py-3">
+                            <div class="d-flex align-items-center justify-content-center flex-column">
+                                <span class="text-muted mb-2">Served Today</span>
+                                <h2 class="text-success mb-0">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
