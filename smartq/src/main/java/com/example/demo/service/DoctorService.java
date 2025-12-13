@@ -2,15 +2,22 @@ package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.demo.bean.Doctor;
 import com.example.demo.dao.DoctorRepository;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DoctorService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    // --- NEW: In-Memory Storage for Served Count ---
+    // This lives in RAM only. It clears automatically when the app restarts.
+    private Map<Long, Integer> sessionServedCounts = new ConcurrentHashMap<>();
+
 
     // Validate doctor credentials
     public Doctor validateDoctor(String username, String password) {
@@ -36,26 +43,32 @@ public class DoctorService {
     }
 
     public Doctor updateDoctor(Doctor updatedInfo) {
-        // 1. Find the existing doctor record by ID
-        // We use the ID coming from the hidden input in the form
         Doctor existingDoctor = doctorRepository.findById(updatedInfo.getId()).orElse(null);
 
         if (existingDoctor != null) {
-            // 2. Update ALL editable fields
             existingDoctor.setUsername(updatedInfo.getUsername());
             existingDoctor.setSpecialization(updatedInfo.getSpecialization());
             existingDoctor.setPassword(updatedInfo.getPassword());
-            
-            // --- THESE WERE MISSING IN YOUR CODE ---
             existingDoctor.setEmail(updatedInfo.getEmail());
             existingDoctor.setPhone(updatedInfo.getPhone());
-            // ---------------------------------------
 
-            // 3. Save the changes
             return doctorRepository.save(existingDoctor);
         }
         
         System.out.println("Error: Doctor ID not found: " + updatedInfo.getId());
         return null;
+    }
+
+    // --- NEW METHODS FOR SESSION COUNTING ---
+
+    // 1. Get the current count from memory (RAM)
+    public int getSessionServedCount(Long doctorId) {
+        return sessionServedCounts.getOrDefault(doctorId, 0);
+    }
+
+    // 2. Increment the count in memory
+    public void incrementSessionServedCount(Long doctorId) {
+        // This adds 1 to the existing count safely
+        sessionServedCounts.merge(doctorId, 1, Integer::sum);
     }
 }

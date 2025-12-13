@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Add Doctor | SmartQ Admin</title>
+    <title>Edit User | SmartQ Admin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -62,7 +62,7 @@
             border-left: none;
         }
         
-        /* Fix border radius when input group text is present */
+        /* Fix border radius for icon wrapper */
         .input-group .input-group-text { border-radius: 10px 0 0 10px; }
 
         .form-control:focus, .form-select:focus {
@@ -71,12 +71,11 @@
             z-index: 1;
         }
         
-        /* Ensure the icon border lights up on focus */
         .input-group:focus-within .input-group-text {
             border-color: var(--primary-color);
         }
 
-        /* Submit Button */
+        /* Update Button (Teal) */
         .btn-submit {
             background: var(--primary-color);
             color: white;
@@ -99,10 +98,10 @@
     <nav class="navbar fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-user-md me-2"></i>Add Doctor
+                <i class="fas fa-user-edit me-2"></i>Edit User
             </a>
-            <a href="/admin/doctorlist" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="fas fa-arrow-left me-1"></i> Back to List
+            <a href="/admin/userlist" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fas fa-times me-1"></i> Cancel
             </a>
         </div>
     </nav>
@@ -112,68 +111,90 @@
             
             <div class="text-center mb-5">
                 <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle p-3 mb-3" style="color: var(--primary-color);">
-                    <i class="fas fa-user-md fa-2x"></i>
+                    <i class="fas fa-user-edit fa-2x"></i>
                 </div>
-                <h3 class="fw-bold text-dark">Register New Specialist</h3>
-                <p class="text-secondary">Enter the doctor's professional details below.</p>
+                <h3 class="fw-bold text-dark">Update User Details</h3>
+                <p class="text-secondary">Modify personal information or system roles below.</p>
             </div>
+            
+            <form th:action="@{/admin/edituser/{id}(id=${user.id})}" th:object="${user}" method="post">
+                
+                <input type="hidden" th:field="*{id}">
 
-            <form th:action="@{/admin/adddoctor}" method="post">
                 <div class="row g-4">
-                    
                     <div class="col-md-6">
-                        <label class="form-label">Full Name</label>
+                        <label class="form-label">Username</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text" name="username" class="form-control" placeholder="Dr. John Doe" required>
+                            <input type="text" th:field="*{username}" class="form-control" required>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Specialization</label>
+                        <label class="form-label">Password</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
-                            <input type="text" name="specialization" class="form-control" placeholder="Cardiology" required>
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="text" th:field="*{password}" class="form-control" placeholder="Leave unchanged to keep current">
+                        </div>
+                        <small class="text-muted" style="font-size: 0.8rem;">Enter new password only if changing it.</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Role</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                            <select th:field="*{role}" class="form-select" required>
+                                <option value="USER">Patient (USER)</option>
+                                <option value="DOCTOR">Doctor</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Age</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                            <input type="number" th:field="*{age}" class="form-control" required>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Email Address</label>
+                        <label class="form-label">Gender</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" name="email" class="form-control" placeholder="doctor@hospital.com" required>
+                            <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                            <select th:field="*{gender}" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Phone Number</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                            <input type="text" name="phone" class="form-control" placeholder="+1 234 567 890">
+                            <input type="text" th:field="*{phone}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Set Password</label>
+                        <label class="form-label">Insurance ID</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" name="password" class="form-control" placeholder="********" required>
+                            <span class="input-group-text"><i class="fas fa-file-medical"></i></span>
+                            <input type="text" th:field="*{insuranceId}" class="form-control">
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Initial Status</label>
+                    <div class="col-md-12">
+                        <label class="form-label">Address</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-toggle-on"></i></span>
-                            <select name="status" class="form-select" required>
-                                <option value="AVAILABLE" selected>Available</option>
-                                <option value="NOT_AVAILABLE">Not Available</option>
-                            </select>
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                            <textarea th:field="*{address}" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="mt-5">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-save me-2"></i> Save Doctor Details
+                        <i class="fas fa-check-circle me-2"></i> Save Changes
                     </button>
                 </div>
             </form>

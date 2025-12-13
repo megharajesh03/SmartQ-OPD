@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.bean.Admin;
 import com.example.demo.bean.Doctor;
+import com.example.demo.bean.User;
 import com.example.demo.dao.AdminRepository;
 import com.example.demo.dao.DoctorRepository;
+import com.example.demo.dao.UserRepository;
 
 @Service
 public class AdminService {
@@ -69,5 +71,56 @@ public class AdminService {
     // View all doctors
     public Iterable<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
+    }
+    
+    @Autowired
+    private UserRepository userRepository; // Assuming you have this repository created
+
+    // Get all users
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Add a new user
+    public User addUser(User user) {
+        // Ideally, encrypt the password here before saving
+        // user.setPassword(passwordEncoder.encode(user.getPassword())); 
+        return userRepository.save(user);
+    }
+
+    // Get user by ID
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    // Edit user
+    public User editUser(Long id, User updatedUser) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser != null) {
+            existingUser.setUsername(updatedUser.getUsername());
+            existingUser.setRole(updatedUser.getRole());
+            existingUser.setAge(updatedUser.getAge());
+            existingUser.setAddress(updatedUser.getAddress());
+            existingUser.setGender(updatedUser.getGender());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setInsuranceId(updatedUser.getInsuranceId());
+            
+            // Only update password if a new one is provided (optional logic)
+            if(updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()){
+                existingUser.setPassword(updatedUser.getPassword());
+            }
+            
+            return userRepository.save(existingUser);
+        }
+        return null;
+    }
+
+    // Delete user
+    public boolean deleteUser(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

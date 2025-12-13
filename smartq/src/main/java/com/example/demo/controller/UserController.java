@@ -61,6 +61,16 @@ public class UserController {
     public String userHome(@RequestParam Long userId, Model model) {
         model.addAttribute("userId", userId);
         
+        // --- NEW CODE STARTS HERE ---
+        // 1. Get the User object so we can read the username
+        User user = userService.getUserById(userId);
+        
+        // 2. Add the username to the model so HTML can see it
+        if (user != null) {
+            model.addAttribute("username", user.getUsername());
+        }
+        // --- NEW CODE ENDS HERE ---
+        
         // Pass the list of doctors so the user can choose one
         model.addAttribute("doctors", adminService.getAllDoctors());
         
@@ -119,5 +129,25 @@ public class UserController {
         
         model.addAttribute("userId", userId);
         return "usertoken"; 
+    }
+    
+    @GetMapping("/editprofile")
+    public String showEditProfilePage(@RequestParam Long userId, Model model) {
+        User user = userService.getUserById(userId);
+        if (user != null) {
+            model.addAttribute("user", user);
+            return "user_edit_profile"; // Maps to the new HTML file
+        }
+        return "redirect:/user/userlogin"; // Fallback
+    }
+
+    // 2. Handle Update Logic
+    @PostMapping("/updateprofile")
+    public String updateProfile(@ModelAttribute User user) {
+        // Call service to save changes
+        userService.updateUser(user);
+        
+        // Redirect back to dashboard with the ID
+        return "redirect:/user/userhome?userId=" + user.getId();
     }
 }

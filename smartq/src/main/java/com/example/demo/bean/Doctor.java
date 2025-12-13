@@ -30,6 +30,9 @@ public class Doctor {
     @Column(nullable = false)
     private String password;
 
+    // --- ADD THIS FIELD ---
+    private int servedCount = 0; 
+    // ----------------------
 	
 
 	public Long getId() {
@@ -114,7 +117,14 @@ public class Doctor {
 		this.status = status;
 	}
 
+	// --- ADD THESE GETTERS AND SETTERS ---
+    public int getServedCount() {
+        return servedCount;
+    }
 
+    public void setServedCount(int servedCount) {
+        this.servedCount = servedCount;
+    }
 
 	// Enum to represent the consultation status
     public enum Status {

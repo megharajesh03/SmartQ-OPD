@@ -32,48 +32,47 @@ public class DoctorController {
                                     @RequestParam String password,
                                     Model model) {
 
-        // Validate doctor credentials for doctor role
         Doctor doctor = doctorService.validateDoctor(username, password);
 
         if (doctor == null) {
-            // If credentials are incorrect, show an error message
             model.addAttribute("error", "Invalid Username or Password");
-            return "doctorlogin";  // Return to the login page if validation fails
+            return "doctorlogin"; 
         }
 
-        // If login is successful, redirect to doctor home page
-        // Include doctorId in the redirect URL
         return "redirect:/doctor/doctorhome?doctorId=" + doctor.getId();
     }
 
     // Doctor home page
     @GetMapping("/doctorhome")
     public String doctorHome(@RequestParam Long doctorId, Model model) {
+        
+        // 1. Get Doctor Details
         Doctor doctor = doctorService.getDoctorById(doctorId);
         model.addAttribute("doctor", doctor);
-        
-        // Add Stats
+
+        // 2. Get Current Patient (if any)
+        ConsultationQueue currentPatient = queueService.getCurrentPatient(doctorId);
+        model.addAttribute("currentPatient", currentPatient != null ? currentPatient.getUser() : null);
+        model.addAttribute("currentToken", currentPatient != null ? currentPatient.getTokenNumber() : "-");
+
+        // 3. Get Waiting Count
         int waitingCount = queueService.getWaitingCount(doctorId);
-        int servedCount = queueService.getServedCount(doctorId);
-        
         model.addAttribute("waitingCount", waitingCount);
-        model.addAttribute("servedCount", servedCount);
-        
-        // Get Current Patient details (if any)
-        ConsultationQueue currentPatientToken = queueService.getCurrentPatient(doctorId);
-        if(currentPatientToken != null) {
-            model.addAttribute("currentPatient", currentPatientToken.getUser());
-            model.addAttribute("currentToken", currentPatientToken.getTokenNumber());
-        }
-        
-        return "doctorhome";  
+
+        // ---------------------------------------------------------
+        // 4. FIX: ADD SERVED COUNT HERE
+        // ---------------------------------------------------------
+        int servedCount = queueService.getServedCount(doctorId); // Fetch from service
+        model.addAttribute("servedCount", servedCount);          // Add to Model
+        // ---------------------------------------------------------
+
+        return "doctorhome"; // This matches your HTML filename
     }
 
     // Mark doctor as available
     @PostMapping("/markAvailable")
     public String markAvailable(@RequestParam Long doctorId) {
         doctorService.setDoctorStatus(doctorId, Doctor.Status.AVAILABLE);
-        // Redirect back to doctor home page with doctorId as a query parameter
         return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  
     }
 
@@ -81,43 +80,41 @@ public class DoctorController {
     @PostMapping("/markNotAvailable")
     public String markNotAvailable(@RequestParam Long doctorId) {
         doctorService.setDoctorStatus(doctorId, Doctor.Status.NOT_AVAILABLE);
-        // Redirect back to doctor home page with doctorId as a query parameter
         return "redirect:/doctor/doctorhome?doctorId=" + doctorId;  
     }
     
     @GetMapping("/editprofile")
     public String showEditProfilePage(@RequestParam Long doctorId, Model model) {
-        // Fetch the existing doctor details to pre-fill the form
         Doctor doctor = doctorService.getDoctorById(doctorId);
         
         if (doctor != null) {
             model.addAttribute("doctor", doctor);
-            return "doctor_edit_profile"; // You need to create this JSP/HTML file
+            return "doctor_edit_profile"; 
         }
         
-        // Fallback if ID is invalid
         return "redirect:/doctor/doctorlogin";
     }
 
-    // 2. Handle the Profile Update form submission
     @PostMapping("/updateprofile")
     public String updateProfile(@ModelAttribute Doctor doctor) {
-        // Call service to update the doctor's details
-        // Note: Ensure your form includes a hidden input for 'id' so it knows which doctor to update
         doctorService.updateDoctor(doctor);
-
-        // Redirect back to the doctor home page with the ID to maintain session/context
         return "redirect:/doctor/doctorhome?doctorId=" + doctor.getId();
     }
     
- // ACTION: Call Next Patient
+    // ACTION: Call Next Patient
     @PostMapping("/callNext")
     public String callNextPatient(@RequestParam Long doctorId) {
-        // 1. QueueService moves the line (Marks current DONE, next IN_CONSULTATION)
-        queueService.callNextPatient(doctorId);
+        
+        // 1. Call the service and capture the result (True/False)
+        boolean patientServed = queueService.callNextPatient(doctorId);
         
         // 2. Ensure Doctor status is AVAILABLE
         doctorService.setDoctorStatus(doctorId, Doctor.Status.AVAILABLE);
+        
+        // 3. ONLY increment the counter if a patient was actually marked as COMPLETED
+        if (patientServed) {
+            doctorService.incrementSessionServedCount(doctorId);
+        }
         
         return "redirect:/doctor/doctorhome?doctorId=" + doctorId;
     }

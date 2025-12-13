@@ -2,8 +2,6 @@ package com.example.demo.service;
 
 import com.example.demo.bean.User;
 import com.example.demo.dao.UserRepository;
-import com.example.demo.dao.AdminRepository;
-import com.example.demo.dao.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +10,12 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepo;
-    @Autowired
-    private AdminRepository adminRepo;
-    @Autowired
-    private DoctorRepository doctorRepo;
+    
+
+    // Add this method if it is missing
+    public User getUserById(Long id) {
+        return userRepo.findById(id).orElse(null);
+    }
 
     // Validate user credentials based on role
     public User validateUser(String username, String password, String role) {
@@ -36,6 +36,30 @@ public class UserService {
             return user;  // Valid user
         }
         return null;  // Invalid user
+    }
+    
+    public User updateUser(User updatedUser) {
+        // 1. Find existing user
+        User existingUser = userRepo.findById(updatedUser.getId()).orElse(null);
+        
+        if (existingUser != null) {
+            // 2. Update fields
+            existingUser.setUsername(updatedUser.getUsername());
+            existingUser.setAge(updatedUser.getAge());
+            existingUser.setGender(updatedUser.getGender());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setAddress(updatedUser.getAddress());
+            existingUser.setInsuranceId(updatedUser.getInsuranceId());
+            
+            // Only update password if user typed something new
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                existingUser.setPassword(updatedUser.getPassword());
+            }
+
+            // 3. Save
+            return userRepo.save(existingUser);
+        }
+        return null;
     }
     
 }

@@ -1,330 +1,124 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | SmartQ</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
     <style>
+        /* ... (Keep your existing styles) ... */
         :root {
             --primary-color: #0d9488;
             --primary-dark: #0f766e;
-            --secondary-bg: #f0fdfa;
+            --teal-bg-start: #f0fdfa;
+            --teal-bg-end: #ccfbf1;
             --text-dark: #1e293b;
-            --text-light: #64748b;
-            --danger-color: #ef4444;
         }
-
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9;
+            background: linear-gradient(135deg, var(--teal-bg-start) 0%, var(--teal-bg-end) 100%);
             min-height: 100vh;
-        }
-
-        /* Navbar Styling */
-        .navbar {
-            background: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            padding: 1rem 2rem;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-color) !important;
-            font-size: 1.5rem;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--secondary-bg);
-            color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        /* Dashboard Content */
-        .dashboard-container {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .page-header {
-            margin-bottom: 2rem;
-        }
-
-        .page-header h2 {
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        .page-header p {
-            color: var(--text-light);
-        }
-
-        /* Stats Cards (Optional visual flair) */
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s;
+            background-attachment: fixed;
         }
         
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        /* Navbar & other styles... (Keep what you have) */
+        .navbar { background: var(--primary-color); padding: 1rem 2rem; box-shadow: 0 4px 20px rgba(13, 148, 136, 0.2); }
+        .navbar-brand { color: white !important; font-weight: 700; font-size: 1.5rem; }
+        .btn-nav-logout { background: #ef4444; color: white; border: none; }
+        
+        /* Cards */
+        .admin-section-card {
+            background: white; border: none; border-radius: 20px; padding: 2.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); height: 100%;
+            transition: transform 0.2s;
         }
+        .admin-section-card:hover { transform: translateY(-5px); }
 
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        /* Special Style for Reset Card */
+        .card-reset { border: 2px solid #fee2e2; background: #fff1f2; }
+        .card-reset .icon-box { background: #fecaca; color: #dc2626; }
+        .btn-reset {
+            background: #dc2626; color: white; border: none; width: 100%;
+            padding: 0.8rem; border-radius: 50px; font-weight: 600;
         }
+        .btn-reset:hover { background: #b91c1c; }
 
-        .stat-info h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-            color: var(--text-dark);
-        }
-
-        .stat-info p {
-            margin: 0;
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-
-        /* Action Grid */
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-            margin-top: 1rem;
-        }
-
-        .action-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            text-decoration: none;
-            color: var(--text-dark);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .action-card:hover {
-            border-color: var(--primary-color);
-            background: var(--secondary-bg);
-            transform: translateY(-5px);
-            color: var(--primary-dark);
-        }
-
-        .action-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-
-        .action-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .action-desc {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: 0.5rem;
-        }
-
-        /* Danger/Logout Button */
-        .logout-btn {
-            background-color: #fee2e2;
-            color: var(--danger-color);
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .logout-btn:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
+        /* Reuse your icon-box/btn styles from before... */
+        .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.5rem; }
+        .card-doctor .icon-box { background: #e0f2fe; color: #0284c7; }
+        .card-user .icon-box { background: #dcfce7; color: #16a34a; }
+        
+        .action-btn { display: block; text-decoration: none; padding: 0.7rem; text-align: center; border-radius: 50px; margin-bottom: 0.5rem; font-weight: 600; }
+        .btn-view { background: #e2e8f0; color: #475569; }
+        .btn-add { border: 2px solid #cbd5e1; color: #475569; }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar fixed-top">
-        <div class="container-fluid">
+        <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-heartbeat me-2"></i>SmartQ Admin
+                <i class="fas fa-shield-alt me-2"></i>SmartQ <span class="fw-light opacity-75 fs-6"> Admin Portal</span>
             </a>
-            <div class="user-profile">
-                <div class="admin-avatar">A</div>
-                <div class="d-none d-sm-block">
-                    <small class="d-block text-secondary" style="font-size: 0.75rem;">Logged in as</small>
-                    <span class="fw-bold">Administrator</span>
-                </div>
-                <a href="#" onclick="confirmLogout()" class="logout-btn ms-3">
-                    <i class="fas fa-sign-out-alt me-1"></i> Logout
-                </a>
-            </div>
+            <a href="/admin/adminlogin" class="btn btn-nav-logout btn-sm rounded-pill px-3">Logout</a>
         </div>
     </nav>
 
-    <div class="dashboard-container" style="margin-top: 80px;">
+    <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
         
-        <div class="page-header">
-            <h2>Dashboard Overview</h2>
-            <p>Welcome back! Here is what's happening at SmartQ today.</p>
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <div class="row mb-4">
-            <!--<div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>12</h3> 
-                        <p>Doctors</p>
-                    </div>
-                </div>
-            </div>-->
-            <!--<div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
-                        <i class="fas fa-procedures"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>45</h3>
-                        <p>Patients</p>
-                    </div>
-                </div>
-            </div>-->
-            <!--<div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #fef9c3; color: #ca8a04;">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>8</h3>
-                        <p>Appointments</p>
-                    </div>
-                </div>
-            </div>-->
-            <!--<div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #fae8ff; color: #9333ea;">
-                        <i class="fas fa-file-medical-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>5</h3>
-                        <p>Pending Reports</p>
-                    </div>
-                </div>
-            </div>-->
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="color: var(--text-dark);">System Overview</h2>
+            <p class="text-secondary">Manage hospital staff, records, and daily operations</p>
         </div>
 
-        <hr class="text-secondary opacity-25 my-4">
+        <div class="row g-4 justify-content-center">
 
-        <div class="section-title">Doctor Management</div>
-        <div class="row g-4 mb-4">
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/adddoctor}" href="/admin/adddoctor" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div class="action-title">Add Doctor</div>
-                    <div class="action-desc">Onboard new medical staff</div>
-                </a>
+            <div class="col-md-4">
+                <div class="admin-section-card card-doctor">
+                    <div class="icon-box"><i class="fas fa-user-md"></i></div>
+                    <h4 class="fw-bold">Doctors</h4>
+                    <p class="text-muted mb-4">Manage doctor profiles and availability.</p>
+                    <a href="/admin/doctorlist" class="action-btn btn-view">View Doctors</a>
+                    <a href="/admin/adddoctor" class="action-btn btn-add">Add Doctor</a>
+                </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/doctorlist}" href="/admin/doctorlist" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-stethoscope"></i>
-                    </div>
-                    <div class="action-title">View Doctors</div>
-                    <div class="action-desc">Manage existing doctor profiles</div>
-                </a>
+
+            <div class="col-md-4">
+                <div class="admin-section-card card-user">
+                    <div class="icon-box"><i class="fas fa-users"></i></div>
+                    <h4 class="fw-bold">Users</h4>
+                    <p class="text-muted mb-4">Manage patient accounts and roles.</p>
+                    <a href="/admin/userlist" class="action-btn btn-view">View Users</a>
+                    <a href="/admin/adduser" class="action-btn btn-add">Add User</a>
+                </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="admin-section-card card-reset">
+                    <div class="icon-box"><i class="fas fa-power-off"></i></div>
+                    <h4 class="fw-bold text-danger">End of Day</h4>
+                    <p class="text-secondary mb-4">Reset all tokens and queues for a fresh start.</p>
+                    
+                    <form action="/admin/resetSystem" method="post" onsubmit="return confirm('⚠️ WARNING: This will delete ALL active tokens and reset the queue for the next day.\n\nAre you sure you want to proceed?');">
+                        <button type="submit" class="btn-reset">
+                            <i class="fas fa-sync-alt me-2"></i> Start New Day
+                        </button>
+                    </form>
+                </div>
+            </div>
+
         </div>
-
-        <div class="section-title">System & Operations</div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
-                <a th:href="@{/admin/manage-users}" href="/admin/manage-users" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-users-cog"></i>
-                    </div>
-                    <div class="action-title">Manage Users</div>
-                    <div class="action-desc">Patient accounts & permissions</div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a th:href="@{/admin/appointments}" href="/admin/appointments" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <div class="action-title">Appointments</div>
-                    <div class="action-desc">Check queue and schedules</div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a th:href="@{/admin/view-reports}" href="/admin/view-reports" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="action-title">View Reports</div>
-                    <div class="action-desc">Hospital analytics and logs</div>
-                </a>
-            </div>
-        </div>
-
-    
-	
-		</div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function confirmLogout() {
-            if(confirm("Are you sure you want to log out?")) {
-                window.location.href = '/adminlogin'; 
-            }
-        }
-    </script>
 </body>
 </html>

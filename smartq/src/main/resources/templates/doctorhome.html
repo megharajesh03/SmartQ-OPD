@@ -110,11 +110,11 @@
     <nav class="navbar fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-hospital-user me-2"></i>SmartQ OPD
+                <i class="fas fa-user-md"></i> SmartQ <span class="fw-light text-secondary fs-6"> Doctor Portal</span>
             </a>
             <div class="d-flex align-items-center">
                 <span class="me-3 text-secondary d-none d-md-block">Dr. <span th:text="${doctor.username}">Smith</span></span>
-                <a href="/doctor/doctorlogin" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <a href="/doctorlogin" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                     <i class="fas fa-sign-out-alt me-1"></i> Logout
                 </a>
             </div>
