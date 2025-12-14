@@ -37,34 +37,56 @@ public class UserService {
         return null; // Invalid credentials or role
     }
     
-    // Update User Profile
+ // Inside UserService.java
+
     public User updateUser(User updatedUser) {
         // 1. Find existing user
         User existingUser = userRepo.findById(updatedUser.getId()).orElse(null);
         
         if (existingUser != null) {
-            // 2. Update basic fields
-            existingUser.setUsername(updatedUser.getUsername());
-            existingUser.setAge(updatedUser.getAge());
-            existingUser.setGender(updatedUser.getGender());
-            existingUser.setPhone(updatedUser.getPhone());
-            existingUser.setAddress(updatedUser.getAddress());
             
-            // 3. Only update password if user typed something new
+            // --- FIX START: Only update User fields if they are present in the request ---
+            
+            if (updatedUser.getUsername() != null && !updatedUser.getUsername().isEmpty()) {
+                existingUser.setUsername(updatedUser.getUsername());
+            }
+
+            if (updatedUser.getRole() != null) {
+                existingUser.setRole(updatedUser.getRole());
+            }
+
+            // check != 0 because 'int' defaults to 0 if not sent
+            if (updatedUser.getAge() != 0) {
+                existingUser.setAge(updatedUser.getAge());
+            }
+
+            if (updatedUser.getAddress() != null) {
+                existingUser.setAddress(updatedUser.getAddress());
+            }
+
+            if (updatedUser.getGender() != null) {
+                existingUser.setGender(updatedUser.getGender());
+            }
+
+            if (updatedUser.getPhone() != null) {
+                existingUser.setPhone(updatedUser.getPhone());
+            }
+
+            // Only update password if user typed something new
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
                 existingUser.setPassword(updatedUser.getPassword());
             }
+            
+            // --- FIX END ---
 
             // 4. Handle Insurance One-to-One Relationship
-            // We removed setInsuranceId. We must update the Insurance Object.
-            Insurance incomingInsurance = updatedUser.getInsurance();
+            com.example.demo.bean.Insurance incomingInsurance = updatedUser.getInsurance();
 
             if (incomingInsurance != null) {
-                Insurance existingInsurance = existingUser.getInsurance();
+                com.example.demo.bean.Insurance existingInsurance = existingUser.getInsurance();
 
                 if (existingInsurance != null) {
-                    // Scenario A: Update existing insurance details
-                    // We update fields individually to keep the same Database ID
+                    // Update existing insurance details
                     existingInsurance.setInsuranceNumber(incomingInsurance.getInsuranceNumber());
                     existingInsurance.setProviderName(incomingInsurance.getProviderName());
                     existingInsurance.setCoverageType(incomingInsurance.getCoverageType());
@@ -73,8 +95,7 @@ public class UserService {
                     existingInsurance.setPremiumAmount(incomingInsurance.getPremiumAmount());
                     existingInsurance.setStatus(incomingInsurance.isStatus());
                 } else {
-                    // Scenario B: User had no insurance, link the new one
-                    // Crucial: Set the user back-reference so the Foreign Key is saved
+                    // Create new insurance
                     incomingInsurance.setUser(existingUser);
                     existingUser.setInsurance(incomingInsurance);
                 }
