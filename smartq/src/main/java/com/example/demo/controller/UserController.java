@@ -32,6 +32,9 @@ public class UserController {
         return "userlogin";  // Shows userlogin.jsp page
     }
 
+    // ==========================================
+    // 1. MODIFIED LOGIN LOGIC
+    // ==========================================
     @PostMapping("/userlogin")
     public String handleUserLogin(@RequestParam String username,
                                   @RequestParam String password,
@@ -44,59 +47,90 @@ public class UserController {
             return "userlogin";
         }
 
-        // --- FIX STARTS HERE ---
+        // --- NEW LOGIC STARTS HERE ---
         
-        // 1. We must redirect to /user/userhome (because of the class mapping)
-        // 2. We must append the userId so the next method can catch it
-        return "redirect:/user/userhome?userId=" + user.getId();
+        // Check the status of the user's insurance
+        String insuranceStatus = userService.checkInsuranceStatus(user.getId());
+
+        // Logic: If Valid -> Home. If Missing/Expired -> Insurance Page
+        if ("VALID".equals(insuranceStatus)) {
+            return "redirect:/user/userhome?userId=" + user.getId();
+        } else {
+            // Redirect to insurance page with a status flag (e.g., to show "Expired" alert)
+            return "redirect:/user/insurance?userId=" + user.getId() + "&status=" + insuranceStatus;
+        }
         
-        // --- FIX ENDS HERE ---
+        // --- NEW LOGIC ENDS HERE ---
     }
 
- // ==========================================
-    // 2. DASHBOARD SECTION (Select Doctor)
+    // ==========================================
+    // 2. NEW INSURANCE PAGE HANDLERS
+    // ==========================================
+
+    // SHOW the Insurance Page
+    @GetMapping("/insurance")
+    public String showInsurancePage(@RequestParam Long userId, 
+                                    @RequestParam(required = false) String status, 
+                                    Model model) {
+        User user = userService.getUserById(userId);
+        
+        if (user != null) {
+            model.addAttribute("user", user); // This contains user.insurance (if exists)
+            model.addAttribute("status", status); // "MISSING" or "EXPIRED"
+            return "user_insurance"; // You need to create user_insurance.jsp/html
+        }
+        return "redirect:/user/userlogin";
+    }
+
+    // SAVE/UPDATE the Insurance Details
+    @PostMapping("/saveInsurance")
+    public String saveInsurance(@ModelAttribute User user) {
+        // We reuse the updateUser method we wrote in UserService
+        // It handles both creating new insurance or updating expired insurance
+        userService.updateUser(user);
+        
+        // After saving, go to dashboard
+        return "redirect:/user/userhome?userId=" + user.getId();
+    }
+    
+    // NOTE: The "Skip" logic is handled in the HTML via a simple link:
+    // <a href="/user/userhome?userId=${user.id}">Skip for now</a>
+
+    // ==========================================
+    // 3. DASHBOARD SECTION (Select Doctor)
     // ==========================================
 
     @GetMapping("/userhome")
     public String userHome(@RequestParam Long userId, Model model) {
         model.addAttribute("userId", userId);
         
-        // --- NEW CODE STARTS HERE ---
-        // 1. Get the User object so we can read the username
         User user = userService.getUserById(userId);
         
-        // 2. Add the username to the model so HTML can see it
         if (user != null) {
             model.addAttribute("username", user.getUsername());
         }
-        // --- NEW CODE ENDS HERE ---
         
-        // Pass the list of doctors so the user can choose one
         model.addAttribute("doctors", adminService.getAllDoctors());
         
-        return "userhome"; // Maps to userhome.html
+        return "userhome"; 
     }
     
     // ==========================================
-    // 3. QUEUE LOGIC (Join & Status)
+    // 4. QUEUE LOGIC (Join & Status)
     // ==========================================
 
     // ACTION: Join Queue (Called when user clicks "Get Token")
     @PostMapping("/joinQueue")
     public String joinQueue(@RequestParam Long userId, @RequestParam Long doctorId) {
         queueService.joinQueue(userId, doctorId);
-        
-        // Redirect to the Token page to see status
         return "redirect:/user/token?userId=" + userId;
     }
     
     // PAGE: View Token (The live waiting screen)
     @GetMapping("/token")
     public String showToken(@RequestParam Long userId, Model model) {
-        // 1. Try to get active token first
         ConsultationQueue token = queueService.getUserToken(userId);
         
-        // 2. If no active token, check if they just finished (for the Billing screen)
         if (token == null) {
             token = queueService.getLastToken(userId);
         }
@@ -115,7 +149,6 @@ public class UserController {
                 statusMsg = "It is your turn! Please enter the cabin.";
             } 
             else {
-                 // Calculate Time
                  estTime = queueService.calculateWaitTime(token.getDoctor().getId(), token.getId());
                  statusMsg = "You are in the queue.";
             }
@@ -131,23 +164,24 @@ public class UserController {
         return "usertoken"; 
     }
     
+    // ==========================================
+    // 5. PROFILE EDITING
+    // ==========================================
+    
     @GetMapping("/editprofile")
     public String showEditProfilePage(@RequestParam Long userId, Model model) {
         User user = userService.getUserById(userId);
         if (user != null) {
             model.addAttribute("user", user);
-            return "user_edit_profile"; // Maps to the new HTML file
+            return "user_edit_profile"; 
         }
-        return "redirect:/user/userlogin"; // Fallback
+        return "redirect:/user/userlogin"; 
     }
 
-    // 2. Handle Update Logic
     @PostMapping("/updateprofile")
     public String updateProfile(@ModelAttribute User user) {
-        // Call service to save changes
         userService.updateUser(user);
-        
-        // Redirect back to dashboard with the ID
         return "redirect:/user/userhome?userId=" + user.getId();
     }
+    
 }

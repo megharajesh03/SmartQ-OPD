@@ -3,20 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | SmartQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        /* ... (Keep your existing styles) ... */
         :root {
             --primary-color: #0d9488;
             --primary-dark: #0f766e;
             --teal-bg-start: #f0fdfa;
             --teal-bg-end: #ccfbf1;
             --text-dark: #1e293b;
+            --danger-color: #dc2626;
+            --danger-hover: #b91c1c;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--teal-bg-start) 0%, var(--teal-bg-end) 100%);
@@ -24,60 +27,177 @@
             background-attachment: fixed;
         }
         
-        /* Navbar & other styles... (Keep what you have) */
-        .navbar { background: var(--primary-color); padding: 1rem 2rem; box-shadow: 0 4px 20px rgba(13, 148, 136, 0.2); }
-        .navbar-brand { color: white !important; font-weight: 700; font-size: 1.5rem; }
-        .btn-nav-logout { background: #ef4444; color: white; border: none; }
+        /* Navbar */
+        .navbar {
+            background: rgba(13, 148, 136, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 2rem;
+            box-shadow: 0 4px 20px rgba(13, 148, 136, 0.15);
+        }
+        .navbar-brand { color: white !important; font-weight: 700; font-size: 1.5rem; letter-spacing: 0.5px; }
+        
+        /* Live Clock */
+        .system-clock {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+            margin-right: 20px;
+            font-family: monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        /* UPDATED: Logout Button (Default Red) */
+        .btn-nav-logout {
+            background: #ef4444; /* Red-500 */
+            color: white;
+            border: none;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-nav-logout:hover {
+            background: #dc2626; /* Red-600 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(220, 38, 38, 0.4);
+        }
         
         /* Cards */
         .admin-section-card {
-            background: white; border: none; border-radius: 20px; padding: 2.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); height: 100%;
-            transition: transform 0.2s;
+            background: white;
+            border: none;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .admin-section-card:hover { transform: translateY(-5px); }
-
-        /* Special Style for Reset Card */
-        .card-reset { border: 2px solid #fee2e2; background: #fff1f2; }
-        .card-reset .icon-box { background: #fecaca; color: #dc2626; }
-        .btn-reset {
-            background: #dc2626; color: white; border: none; width: 100%;
-            padding: 0.8rem; border-radius: 50px; font-weight: 600;
+        .admin-section-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -5px rgba(13, 148, 136, 0.15);
         }
-        .btn-reset:hover { background: #b91c1c; }
 
-        /* Reuse your icon-box/btn styles from before... */
-        .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.5rem; }
+        /* Stat Badge */
+        .stat-badge {
+            position: absolute; top: 20px; right: 20px;
+            padding: 5px 12px; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+
+        /* Icon Box */
+        .icon-box {
+            width: 80px; height: 80px;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .admin-section-card:hover .icon-box { transform: scale(1.1) rotate(5deg); }
         .card-doctor .icon-box { background: #e0f2fe; color: #0284c7; }
         .card-user .icon-box { background: #dcfce7; color: #16a34a; }
+
+        /* Action Buttons Wrapper */
+        .action-group { display: flex; gap: 10px; margin-top: 20px; }
+        .action-btn {
+            flex: 1;
+            text-decoration: none;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        /* UPDATED: Doctor Card Buttons (Blue Theme) */
+        .card-doctor .btn-view {
+            background: #e0f2fe; /* Light Blue */
+            color: #0369a1; /* Dark Blue Text */
+        }
+        .card-doctor .btn-view:hover { background: #bae6fd; color: #0284c7; }
         
-        .action-btn { display: block; text-decoration: none; padding: 0.7rem; text-align: center; border-radius: 50px; margin-bottom: 0.5rem; font-weight: 600; }
-        .btn-view { background: #e2e8f0; color: #475569; }
-        .btn-add { border: 2px solid #cbd5e1; color: #475569; }
+        .card-doctor .btn-add {
+            background: transparent;
+            border: 2px solid #38bdf8;
+            color: #0284c7;
+        }
+        .card-doctor .btn-add:hover { background: #38bdf8; color: white; }
+
+        /* UPDATED: User/Patient Card Buttons (Green Theme) */
+        .card-user .btn-view {
+            background: #dcfce7; /* Light Green */
+            color: #15803d; /* Dark Green Text */
+        }
+        .card-user .btn-view:hover { background: #bbf7d0; color: #16a34a; }
+
+        .card-user .btn-add {
+            background: transparent;
+            border: 2px solid #4ade80;
+            color: #16a34a;
+        }
+        .card-user .btn-add:hover { background: #4ade80; color: white; }
+
+        /* Reset Card Styles */
+        .card-reset {
+            border: 2px dashed #fecaca;
+            background: linear-gradient(to bottom right, #ffffff, #fff1f2);
+        }
+        .card-reset:hover { border-color: #ef4444; }
+        .card-reset .icon-box { background: #fee2e2; color: #dc2626; }
+        
+        .btn-reset {
+            background: var(--danger-color);
+            color: white; border: none; width: 100%; padding: 1rem;
+            border-radius: 12px; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-reset:hover { background: #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+
+        /* Modal */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: none; padding: 2rem 2rem 1rem; }
+        .modal-body { padding: 0 2rem 2rem; }
+        .modal-footer { border-top: none; padding: 0 2rem 2rem; }
+        .verification-input { letter-spacing: 2px; text-transform: uppercase; font-weight: bold; text-align: center; }
     </style>
 </head>
 
 <body>
 
     <nav class="navbar fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-shield-alt me-2"></i>SmartQ <span class="fw-light opacity-75 fs-6"> Admin Portal</span>
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-user-shield me-2"></i>SmartQ<span class="fw-light opacity-75 fs-6"> Admin Portal</span>
             </a>
-            <a href="/admin/adminlogin" class="btn btn-nav-logout btn-sm rounded-pill px-3">Logout</a>
+            
+            <div class="d-flex align-items-center">
+                <div class="system-clock d-none d-md-block">
+                    <i class="far fa-clock me-1"></i> <span id="liveClock">--:--:--</span>
+                </div>
+                <a href="/admin/adminlogin" class="btn btn-nav-logout btn-sm rounded-pill px-4">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
         </div>
     </nav>
 
-    <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <div class="container" style="margin-top: 130px; margin-bottom: 50px;">
         
-        <div th:if="${message}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            <i class="fas fa-check-circle me-2"></i> <span th:text="${message}"></span>
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show mb-4 shadow-sm border-0" role="alert" style="background: #ecfdf5; color: #065f46;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle fa-lg me-3"></i>
+                <div>
+                    <strong>Success!</strong> <span th:text="${message}"></span>
+                </div>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: var(--text-dark);">System Overview</h2>
-            <p class="text-secondary">Manage hospital staff, records, and daily operations</p>
+            <h2 class="fw-bold display-6" style="color: var(--text-dark);">System Overview</h2>
+            <p class="text-secondary">Welcome back, Admin. Here is what's happening today.</p>
         </div>
 
         <div class="row g-4 justify-content-center">
@@ -86,39 +206,107 @@
                 <div class="admin-section-card card-doctor">
                     <div class="icon-box"><i class="fas fa-user-md"></i></div>
                     <h4 class="fw-bold">Doctors</h4>
-                    <p class="text-muted mb-4">Manage doctor profiles and availability.</p>
-                    <a href="/admin/doctorlist" class="action-btn btn-view">View Doctors</a>
-                    <a href="/admin/adddoctor" class="action-btn btn-add">Add Doctor</a>
+                    <p class="text-muted mb-2">Manage medical staff profiles.</p>
+                    
+                    <div class="action-group">
+                        <a href="/admin/doctorlist" class="action-btn btn-view">View List</a>
+                        <a href="/admin/adddoctor" class="action-btn btn-add" title="Register new doctor"><i class="fas fa-plus"></i></a>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="admin-section-card card-user">
                     <div class="icon-box"><i class="fas fa-users"></i></div>
-                    <h4 class="fw-bold">Users</h4>
-                    <p class="text-muted mb-4">Manage patient accounts and roles.</p>
-                    <a href="/admin/userlist" class="action-btn btn-view">View Users</a>
-                    <a href="/admin/adduser" class="action-btn btn-add">Add User</a>
+                    <h4 class="fw-bold">Patients</h4>
+                    <p class="text-muted mb-2">Manage user registrations.</p>
+                    
+                    <div class="action-group">
+                        <a href="/admin/userlist" class="action-btn btn-view">View List</a>
+                        <a href="/admin/adduser" class="action-btn btn-add" title="Register new patient"><i class="fas fa-plus"></i></a>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="admin-section-card card-reset">
+                    <span class="stat-badge bg-danger-subtle text-danger">Critical Zone</span>
                     <div class="icon-box"><i class="fas fa-power-off"></i></div>
                     <h4 class="fw-bold text-danger">End of Day</h4>
-                    <p class="text-secondary mb-4">Reset all tokens and queues for a fresh start.</p>
+                    <p class="text-secondary mb-4">Reset queues and tokens for tomorrow.</p>
                     
-                    <form action="/admin/resetSystem" method="post" onsubmit="return confirm('⚠️ WARNING: This will delete ALL active tokens and reset the queue for the next day.\n\nAre you sure you want to proceed?');">
-                        <button type="submit" class="btn-reset">
-                            <i class="fas fa-sync-alt me-2"></i> Start New Day
-                        </button>
-                    </form>
+                    <button type="button" class="btn-reset shadow-sm" data-bs-toggle="modal" data-bs-target="#resetModal">
+                        <i class="fas fa-sync-alt me-2"></i> Reset System
+                    </button>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <div class="modal fade" id="resetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>System Reset Warning
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">This action will <strong>permanently delete</strong> all active tokens and clear the queue for the current day. This cannot be undone.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Type "CONFIRM" to proceed:</label>
+                        <input type="text" class="form-control verification-input" id="verificationInput" placeholder="CONFIRM">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    
+                    <form action="/admin/resetSystem" method="post" id="resetForm">
+                        <button type="submit" class="btn btn-danger rounded-pill px-4" id="confirmResetBtn" disabled>
+                            <span class="normal-text">Execute Reset</span>
+                            <span class="loading-text d-none"><i class="fas fa-spinner fa-spin me-2"></i>Processing...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveClock').textContent = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Safety Modal Logic
+        const verificationInput = document.getElementById('verificationInput');
+        const confirmBtn = document.getElementById('confirmResetBtn');
+        const resetForm = document.getElementById('resetForm');
+        const loadingText = document.querySelector('.loading-text');
+        const normalText = document.querySelector('.normal-text');
+
+        verificationInput.addEventListener('input', function() {
+            if (this.value === 'CONFIRM') {
+                confirmBtn.removeAttribute('disabled');
+            } else {
+                confirmBtn.setAttribute('disabled', 'true');
+            }
+        });
+
+        resetForm.addEventListener('submit', function() {
+            confirmBtn.setAttribute('disabled', 'true');
+            normalText.classList.add('d-none');
+            loadingText.classList.remove('d-none');
+        });
+    </script>
 </body>
 </html>

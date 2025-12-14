@@ -1,25 +1,24 @@
 package com.example.demo.bean;
 
 import java.util.Date;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class Insurance {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // AUTO_INCREMENT behavior in SQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Changed the column name for the foreign key to avoid duplication of 'id'
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)  // Use 'user_id' as the foreign key column
-    private User user;  // Foreign Key to User
+    // --- RELATIONSHIP CHANGE START ---
+    
+    // Changed from @ManyToOne to @OneToOne
+    // This side holds the Foreign Key (user_id)
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true) // unique=true ensures 1:1 in the DB schema
+    private User user;
+    
+    // --- RELATIONSHIP CHANGE END ---
 
     @Column(unique = true, nullable = false)
     private String insuranceNumber;
@@ -36,7 +35,7 @@ public class Insurance {
     private Double premiumAmount;
 
     @Column(nullable = false)
-    private boolean status = true;  // Default value is true
+    private boolean status = true;
 
     // Constructors, Getters, and Setters
 
@@ -125,5 +124,4 @@ public class Insurance {
     public void setStatus(boolean status) {
         this.status = status;
     }
-
 }

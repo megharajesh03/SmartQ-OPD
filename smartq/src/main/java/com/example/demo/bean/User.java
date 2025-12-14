@@ -1,22 +1,23 @@
 package com.example.demo.bean;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")  // Ensure it uses the correct table name
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment for the ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;  // Unique username for each user
+    private String username;
 
     @Column(nullable = false)
-    private String password;  // Store password (preferably encrypted)
+    private String password;
 
     @Column(nullable = false)
-    private String role;  // Roles like ADMIN, DOCTOR, USER
+    private String role;
     
     @Column(nullable = false)
     private int age;
@@ -27,118 +28,106 @@ public class User {
 
     private String phone;
 
-    private String insuranceId;
+    // --- RELATIONSHIP CHANGE START ---
     
-   
+    // 1. Removed 'String insuranceId'
+    // 2. Added 'Insurance' object
+    // 3. mappedBy = "user" tells Hibernate that the Foreign Key is in the Insurance table
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Insurance insurance;
+    
+    // --- RELATIONSHIP CHANGE END ---
+
     // --- Constructors ---
     
     public User() {
-        // Default constructor (for JPA)
     }
 
+    // Updated constructor to accept Insurance object instead of String insuranceId
+    public User(Long id, String username, String password, String role, int age, String address, String gender, String phone) {
+        super();
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.age = age;
+        this.address = address;
+        this.gender = gender;
+        this.phone = phone;
+    }
 
-	public User(Long id, String username, String password, String role, int age, String address, String gender,
-			String phone, String insuranceId) {
-		super();
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.role = role;
-		this.age = age;
-		this.address = address;
-		this.gender = gender;
-		this.phone = phone;
-		this.insuranceId = insuranceId;
-	}
+    // Getters and Setters
 
+    public Long getId() {
+        return id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public String getUsername() {
+        return username;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
+    public String getPassword() {
+        return password;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
+    public String getRole() {
+        return role;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
+    public int getAge() {
+        return age;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setAge(int age) {
+        this.age = age;
+    }
 
+    public String getAddress() {
+        return address;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
+    public String getGender() {
+        return gender;
+    }
 
-	public String getRole() {
-		return role;
-	}
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
+    public String getPhone() {
+        return phone;
+    }
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
+    // New Getter and Setter for Insurance Entity
+    public Insurance getInsurance() {
+        return insurance;
+    }
 
-	public int getAge() {
-		return age;
-	}
-
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-
-
-	public String getAddress() {
-		return address;
-	}
-
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-
-	public String getGender() {
-		return gender;
-	}
-
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-
-	public String getPhone() {
-		return phone;
-	}
-
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-
-	public String getInsuranceId() {
-		return insuranceId;
-	}
-
-
-	public void setInsuranceId(String insuranceId) {
-		this.insuranceId = insuranceId;
-	}
-   
+    public void setInsurance(Insurance insurance) {
+        this.insurance = insurance;
+    }
 }

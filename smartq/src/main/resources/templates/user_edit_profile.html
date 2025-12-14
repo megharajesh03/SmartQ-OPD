@@ -12,20 +12,17 @@
         :root {
             --primary-color: #0d9488;
             --primary-dark: #0f766e;
-            /* New gradient colors for the theme background */
-            --teal-bg-start: #f0fdfa; /* Very light mint/teal */
-            --teal-bg-end: #ccfbf1;   /* Light teal */
+            --teal-bg-start: #f0fdfa; 
+            --teal-bg-end: #ccfbf1;   
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            /* Changed background from flat gray to a themed gradient */
             background: linear-gradient(135deg, var(--teal-bg-start) 0%, var(--teal-bg-end) 100%);
             min-height: 100vh;
-            padding-bottom: 2rem; /* Add some breathing room at bottom */
+            padding-bottom: 2rem; 
         }
 
-        /* Navbar - keep white for contrast */
         .navbar {
             background: #ffffff;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
@@ -36,17 +33,15 @@
         .form-card {
             background: white;
             border-radius: 20px;
-            /* Slightly deeper shadow so it pops off the gradient background */
             border: none;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
             padding: 2.5rem;
             max-width: 800px;
-            margin: 120px auto 0 auto; /* Top margin clears navbar */
+            margin: 120px auto 0 auto; 
         }
 
         .form-label { font-weight: 500; color: #334155; margin-bottom: 0.5rem; }
         
-        /* Input Styles - using a very light gray background for inputs to contrast with the white card */
         .input-group-text { background-color: #f8fafc; border: 1px solid #cbd5e1; border-right: none; color: var(--primary-color); }
         .form-control, .form-select { border-radius: 0 10px 10px 0; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-left: none; }
         .input-group .input-group-text { border-radius: 10px 0 0 10px; }
@@ -87,7 +82,9 @@
             <form th:action="@{/user/updateprofile}" th:object="${user}" method="post">
                 
                 <input type="hidden" th:field="*{id}">
-                <input type="hidden" th:field="*{role}"> <div class="row g-4">
+                <input type="hidden" th:field="*{role}"> 
+                
+                <div class="row g-4">
                     <div class="col-md-6">
                         <label class="form-label">Username</label>
                         <div class="input-group">
@@ -130,14 +127,7 @@
                             <input type="text" th:field="*{phone}" class="form-control">
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Insurance ID</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-file-medical"></i></span>
-                            <input type="text" th:field="*{insuranceId}" class="form-control">
-                        </div>
-                    </div>
-
+                    
                     <div class="col-md-12">
                         <label class="form-label">Address</label>
                         <div class="input-group">

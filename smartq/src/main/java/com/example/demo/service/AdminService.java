@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.bean.Admin;
 import com.example.demo.bean.Doctor;
+import com.example.demo.bean.Insurance;
 import com.example.demo.bean.User;
 import com.example.demo.dao.AdminRepository;
 import com.example.demo.dao.DoctorRepository;
@@ -19,32 +20,30 @@ public class AdminService {
     @Autowired
     private AdminRepository adminRepository;
     
-    
+    @Autowired
+    private UserRepository userRepository;
+
+    // ------------------- ADMIN AUTH -------------------
+
     public boolean validateAdmin(String username, String password) {
-        // Fetch admin from the database by username
         Admin admin = adminRepository.findByUsername(username);
-
         if (admin != null) {
-            // Compare the provided password with the stored password (hash comparison if using bcrypt)
-            return admin.getPassword().equals(password);  // Change this to bcrypt comparison if using encryption
+            // Compare passwords (plain text for now, ideally use BCrypt)
+            return admin.getPassword().equals(password); 
         }
-
-        return false;  // Return false if admin not found or password doesn't match
+        return false;
     }
 
-    // Add new doctor
+    // ------------------- DOCTOR CRUD -------------------
+
     public Doctor addDoctor(Doctor doctor) {
-    	
         return doctorRepository.save(doctor);
-        
     }
 
-    // Get doctor by ID
     public Doctor getDoctorById(Long doctorId) {
         return doctorRepository.findById(doctorId).orElse(null);
     }
 
-    // Edit doctor details
     public Doctor editDoctor(Long doctorId, Doctor updatedDoctor) {
         Doctor existingDoctor = doctorRepository.findById(doctorId).orElse(null);
         if (existingDoctor != null) {
@@ -52,14 +51,18 @@ public class AdminService {
             existingDoctor.setSpecialization(updatedDoctor.getSpecialization());
             existingDoctor.setEmail(updatedDoctor.getEmail());
             existingDoctor.setPhone(updatedDoctor.getPhone());
-            existingDoctor.setPassword(updatedDoctor.getPassword());
             existingDoctor.setStatus(updatedDoctor.getStatus());
+            
+            // Update password only if provided
+            if(updatedDoctor.getPassword() != null && !updatedDoctor.getPassword().isEmpty()){
+                existingDoctor.setPassword(updatedDoctor.getPassword());
+            }
+
             return doctorRepository.save(existingDoctor);
         }
-        return null;  // Return null if doctor doesn't exist
+        return null;
     }
 
-    // Delete doctor
     public boolean deleteDoctor(Long doctorId) {
         if (doctorRepository.existsById(doctorId)) {
             doctorRepository.deleteById(doctorId);
@@ -68,46 +71,70 @@ public class AdminService {
         return false;
     }
 
-    // View all doctors
     public Iterable<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
     }
-    
-    @Autowired
-    private UserRepository userRepository; // Assuming you have this repository created
 
-    // Get all users
+    // ------------------- USER CRUD -------------------
+
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // Add a new user
     public User addUser(User user) {
+        // IMPORTANT: Bidirectional Relationship Maintenance
+        // If the incoming user has insurance details, we must tell the Insurance object
+        // who it belongs to before saving.
+        if (user.getInsurance() != null) {
+            user.getInsurance().setUser(user);
+        }
+        
         // Ideally, encrypt the password here before saving
-        // user.setPassword(passwordEncoder.encode(user.getPassword())); 
         return userRepository.save(user);
     }
 
-    // Get user by ID
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    // Edit user
     public User editUser(Long id, User updatedUser) {
         User existingUser = userRepository.findById(id).orElse(null);
+        
         if (existingUser != null) {
+            // 1. Update Basic User Details
             existingUser.setUsername(updatedUser.getUsername());
             existingUser.setRole(updatedUser.getRole());
             existingUser.setAge(updatedUser.getAge());
             existingUser.setAddress(updatedUser.getAddress());
             existingUser.setGender(updatedUser.getGender());
             existingUser.setPhone(updatedUser.getPhone());
-            existingUser.setInsuranceId(updatedUser.getInsuranceId());
             
-            // Only update password if a new one is provided (optional logic)
+            // 2. Update Password (only if a new one is provided)
             if(updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()){
                 existingUser.setPassword(updatedUser.getPassword());
+            }
+            
+            // 3. Update One-to-One Insurance Relationship
+            Insurance incomingInsurance = updatedUser.getInsurance();
+            
+            if (incomingInsurance != null) {
+                Insurance existingInsurance = existingUser.getInsurance();
+                
+                if (existingInsurance != null) {
+                    // Scenario A: User already has insurance. Update the existing record.
+                    existingInsurance.setInsuranceNumber(incomingInsurance.getInsuranceNumber());
+                    existingInsurance.setProviderName(incomingInsurance.getProviderName());
+                    existingInsurance.setCoverageType(incomingInsurance.getCoverageType());
+                    existingInsurance.setValidityStart(incomingInsurance.getValidityStart());
+                    existingInsurance.setValidityEnd(incomingInsurance.getValidityEnd());
+                    existingInsurance.setPremiumAmount(incomingInsurance.getPremiumAmount());
+                    existingInsurance.setStatus(incomingInsurance.isStatus());
+                } else {
+                    // Scenario B: User had no insurance. Set the new one.
+                    // Must link the back-reference
+                    incomingInsurance.setUser(existingUser);
+                    existingUser.setInsurance(incomingInsurance);
+                }
             }
             
             return userRepository.save(existingUser);
@@ -115,7 +142,6 @@ public class AdminService {
         return null;
     }
 
-    // Delete user
     public boolean deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
