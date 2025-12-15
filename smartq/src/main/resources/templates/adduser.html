@@ -114,7 +114,7 @@
 				    <i class="fas fa-user-plus fa-2x"></i>
 				</div>
                 <h3 class="fw-bold text-dark">Create New User Account</h3>
-                <p class="text-secondary">Register a new Patient, Admin, or Staff member.</p>
+                <p class="text-secondary">Register a new Patient.</p>
             </div>
             
             <form th:action="@{/admin/adduser}" th:object="${user}" method="post">
@@ -124,14 +124,14 @@
                         <label class="form-label">Username</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text" th:field="*{username}" class="form-control" placeholder="johndoe" required>
+                            <input type="text" th:field="*{username}" class="form-control" placeholder="johndoe" required />
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" th:field="*{password}" class="form-control" placeholder="******" required>
+                            <input type="password" th:field="*{password}" class="form-control" placeholder="******" required />
                         </div>
                     </div>
 
@@ -141,8 +141,8 @@
                             <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                             <select th:field="*{role}" class="form-select" required>
                                 <option value="USER" selected>Patient (USER)</option>
-                                <option value="DOCTOR">Doctor</option>
-                                <option value="ADMIN">Admin</option>
+                                <!--<option value="DOCTOR">Doctor</option>
+                                <option value="ADMIN">Admin</option>-->
                             </select>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                         <label class="form-label">Age</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
-                            <input type="number" th:field="*{age}" class="form-control" placeholder="25" required>
+                            <input type="number" th:field="*{age}" class="form-control" placeholder="25" required />
                         </div>
                     </div>
 
@@ -169,17 +169,22 @@
                         <label class="form-label">Phone Number</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                            <input type="text" th:field="*{phone}" class="form-control" placeholder="+1 234 567 890">
+                            <input type="text" th:field="*{phone}" class="form-control" placeholder="+1 234 567 890" />
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Insurance ID</label>
+                        <label class="form-label">Insurance Number</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-file-medical"></i></span>
-                            <input type="text" th:field="*{insuranceId}" class="form-control" placeholder="INS-12345">
+                            
+                            <input type="text" 
+                                   name="insurance.insuranceNumber" 
+                                   class="form-control" 
+                                   placeholder="INS-12345" />
                         </div>
                     </div>
+                    
                     <div class="col-md-12">
                         <label class="form-label">Address</label>
                         <div class="input-group">

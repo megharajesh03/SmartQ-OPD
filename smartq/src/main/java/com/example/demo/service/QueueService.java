@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,46 +25,32 @@ public class QueueService {
     @Autowired
     private DoctorRepository doctorRepository;
 
-    // =========================================================
-    //  PART 1: RESET LOGIC (Queue + Doctor Stats)
-    // =========================================================
-    
+    // --- PART 1: RESET LOGIC ---
+
     @Transactional
     public void resetDailyQueue() {
         System.out.println("⚠️ Action: Resetting System for a new day...");
-        
-        // 1. Clear the Waiting Queue
         queueRepository.deleteAll();
         
-        // 2. Reset "Served Patients" count for ALL Doctors to 0
         List<Doctor> allDoctors = doctorRepository.findAll();
-        
         for (Doctor doc : allDoctors) {
-            doc.setServedCount(0); // <--- This will now work!
+            doc.setServedCount(0);
         }
-        
         doctorRepository.saveAll(allDoctors);
-        
         System.out.println("✅ Queue cleared & Doctor stats reset to 0.");
     }
 
-    /**
-     * Automatic Reset: Runs every night at Midnight (00:00).
-     */
     @Scheduled(cron = "0 0 0 * * *")
     public void cleanQueueAtMidnight() {
         resetDailyQueue();
     }
 
-    // =========================================================
-    //  PART 2: QUEUE OPERATIONS
-    // =========================================================
+    // --- PART 2: QUEUE OPERATIONS ---
 
     public ConsultationQueue joinQueue(Long userId, Long doctorId) {
         User user = userRepository.findById(userId).orElse(null);
         Doctor doctor = doctorRepository.findById(doctorId).orElse(null);
 
-        // Logic: 0 + 1 = Token #1
         int nextTokenNum = queueRepository.countByDoctorId(doctorId) + 1;
 
         ConsultationQueue queue = new ConsultationQueue();
@@ -86,9 +71,7 @@ public class QueueService {
         return queueRepository.findTopByUserIdOrderByIdDesc(userId);
     }
 
-    // =========================================================
-    //  PART 3: DOCTOR ACTIONS
-    // =========================================================
+    // --- PART 3: DOCTOR ACTIONS ---
 
     public boolean callNextPatient(Long doctorId) {
         boolean patientWasServed = false;
@@ -100,9 +83,8 @@ public class QueueService {
         if (current != null) {
             current.setConsultationStatus(ConsultationQueue.ConsultationStatus.COMPLETED);
             queueRepository.save(current);
-            patientWasServed = true; // Signal that we served someone
+            patientWasServed = true; 
             
-            // Increment the Doctor's personal counter manually here
             Doctor doc = doctorRepository.findById(doctorId).orElse(null);
             if(doc != null) {
                 doc.setServedCount(doc.getServedCount() + 1);
@@ -122,21 +104,16 @@ public class QueueService {
         return patientWasServed;
     }
     
-    // =========================================================
-    //  PART 4: STATISTICS & CALCULATIONS
-    // =========================================================
+    // --- PART 4: STATISTICS & CALCULATIONS (UPDATED FOR YOUR LOGIC) ---
 
     public int calculateWaitTime(Long doctorId, Long currentTokenId) {
+        // 1. Count ONLY the people who are currently 'WAITING' and joined before me (Id < MyId)
         int peopleAhead = queueRepository.countByDoctorIdAndConsultationStatusAndIdLessThan(
                 doctorId, ConsultationQueue.ConsultationStatus.WAITING, currentTokenId);
         
-        boolean isDoctorBusy = queueRepository.existsByDoctorIdAndConsultationStatus(
-                doctorId, ConsultationQueue.ConsultationStatus.IN_CONSULTATION);
-        
-        if(isDoctorBusy) {
-            peopleAhead++; 
-        }
-
+        // 2. Calculate Time: Just multiply people ahead by 10.
+        // If I am the 1st person waiting -> peopleAhead is 0 -> Time is 0 mins.
+        // If I am the 2nd person waiting -> peopleAhead is 1 -> Time is 10 mins.
         return peopleAhead * 10; 
     }
 
@@ -144,7 +121,6 @@ public class QueueService {
         return queueRepository.countByDoctorIdAndConsultationStatus(doctorId, ConsultationQueue.ConsultationStatus.WAITING);
     }
 
-    // UPDATED: Now we just return the variable stored in the Doctor table
     public int getServedCount(Long doctorId) {
         Doctor doc = doctorRepository.findById(doctorId).orElse(null);
         return (doc != null) ? doc.getServedCount() : 0;

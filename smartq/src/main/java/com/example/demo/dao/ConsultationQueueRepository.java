@@ -24,12 +24,12 @@ public interface ConsultationQueueRepository extends JpaRepository<ConsultationQ
     // 5. Find the next person in the waiting line (WAITING, ordered by time/ID ascending)
     ConsultationQueue findFirstByDoctorIdAndConsultationStatusOrderByIdAsc(Long doctorId, ConsultationStatus status);
 
-    // 6. Calculate people ahead: Count how many WAITING tokens have an ID smaller than the current user's ID
-    int countByDoctorIdAndConsultationStatusAndIdLessThan(Long doctorId, ConsultationStatus status, Long id);
-
     // 7. Check if the doctor is currently busy (used to add extra time to estimate)
     boolean existsByDoctorIdAndConsultationStatus(Long doctorId, ConsultationStatus status);
 
     // 8. Stats: Count specific statuses (How many Waiting? How many Completed?)
     int countByDoctorIdAndConsultationStatus(Long doctorId, ConsultationStatus status);
+    
+ // Add this inside the interface
+    int countByDoctorIdAndConsultationStatusAndIdLessThan(Long doctorId, ConsultationQueue.ConsultationStatus status, Long id);
 }
