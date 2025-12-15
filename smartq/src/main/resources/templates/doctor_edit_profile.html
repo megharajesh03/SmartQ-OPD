@@ -121,6 +121,18 @@
             color: #475569;
             border-color: #cbd5e1;
         }
+
+        /* Password Toggle Button Style */
+        .password-toggle {
+            cursor: pointer;
+            background-color: white; /* Matches form control bg */
+            border-color: #e2e8f0;   /* Matches form control border */
+            border-left: none;
+            color: #64748b;
+        }
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -135,7 +147,7 @@
             </div>
 
             <div class="form-body">
-                <form th:action="@{/doctor/updateprofile}" method="post">
+                <form th:action="@{/doctor/updateprofile}" method="post" id="profileForm">
                     
                     <input type="hidden" name="id" th:value="${doctor.id}">
 
@@ -179,13 +191,28 @@
                         <label for="password" class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="text" id="password" name="password" class="form-control" th:value="${doctor.password}" required>
+                            
+                            <input type="password" 
+                                   id="passwordInput" 
+                                   name="password" 
+                                   class="form-control" 
+                                   th:value="${doctor.password}" 
+                                   style="border-right: none;">
+                            
+                            <span class="input-group-text password-toggle" id="togglePassword">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </span>
                         </div>
+                        
+                        <div id="passwordError" class="text-danger small mt-1" style="display:none;">
+                            <i class="fas fa-exclamation-circle me-1"></i> 
+                            Min 5 chars, letters & numbers required.
+                        </div>
+
                         <div class="form-text text-muted ms-1">
                             Ensure your password is secure.
                         </div>
                     </div>
-
                     <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-submit">
                             <i class="fas fa-save me-2"></i> Save Changes
@@ -202,5 +229,66 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 1. Toggle Password Visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const passwordInput = document.querySelector('#passwordInput');
+        const eyeIcon = document.querySelector('#eyeIcon');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye slash icon
+            if (type === 'text') {
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // 2. Validate Password Rules on Form Submit
+        const form = document.querySelector('#profileForm');
+        const errorMsg = document.querySelector('#passwordError');
+
+        form.addEventListener('submit', function (e) {
+            const password = passwordInput.value;
+
+            // Only validate if there is a password value present
+            if (password.length > 0) {
+                // Rule: At least 5 characters
+                const lengthCheck = password.length >= 5;
+                // Rule: Must contain at least one letter and one number
+                const mixCheck = /[a-zA-Z]/.test(password) && /\d/.test(password);
+
+                if (!lengthCheck || !mixCheck) {
+                    e.preventDefault(); // Stop form submission
+                    errorMsg.style.display = 'block'; // Show error message
+                    passwordInput.focus();
+                    
+                    // Highlight border to indicate error (using #dc3545 for Bootstrap danger red)
+                    passwordInput.style.borderColor = '#dc3545';
+                    togglePassword.style.borderColor = '#dc3545';
+                } else {
+                    errorMsg.style.display = 'none';
+                    // Reset to default theme border color
+                    passwordInput.style.borderColor = '#e2e8f0';
+                    togglePassword.style.borderColor = '#e2e8f0';
+                }
+            }
+        });
+        
+        // Clear error when user starts typing
+        passwordInput.addEventListener('input', function() {
+            errorMsg.style.display = 'none';
+            passwordInput.style.borderColor = '#e2e8f0';
+            togglePassword.style.borderColor = '#e2e8f0';
+        });
+    </script>
+
 </body>
 </html>

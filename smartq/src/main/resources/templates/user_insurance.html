@@ -49,7 +49,6 @@
         .form-control:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1); }
         .input-group:focus-within .input-group-text { border-color: var(--primary-color); }
 
-        /* Custom Alert Styles */
         .status-alert {
             border-radius: 12px;
             padding: 1rem;
@@ -58,16 +57,8 @@
             align-items: center;
             gap: 1rem;
         }
-        .alert-warning-custom {
-            background-color: #fffbeb;
-            border: 1px solid #fcd34d;
-            color: #92400e;
-        }
-        .alert-info-custom {
-            background-color: #ecfeff;
-            border: 1px solid #a5f3fc;
-            color: #155e75;
-        }
+        .alert-warning-custom { background-color: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+        .alert-info-custom { background-color: #ecfeff; border: 1px solid #a5f3fc; color: #155e75; }
 
         .btn-save {
             background: var(--primary-color); color: white; border-radius: 50px;
@@ -158,7 +149,12 @@
                         <label class="form-label">Validity Start</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                            <input type="date" th:field="*{insurance.validityStart}" class="form-control" required>
+                            <input type="date" 
+                                   id="startDate" 
+                                   name="insurance.validityStart"
+                                   th:value="${user.insurance != null and user.insurance.validityStart != null ? #dates.format(user.insurance.validityStart, 'yyyy-MM-dd') : ''}"
+                                   class="form-control" 
+                                   required>
                         </div>
                     </div>
 
@@ -166,7 +162,12 @@
                         <label class="form-label">Validity End</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
-                            <input type="date" th:field="*{insurance.validityEnd}" class="form-control" required>
+                            <input type="date" 
+                                   id="endDate" 
+                                   name="insurance.validityEnd"
+                                   th:value="${user.insurance != null and user.insurance.validityEnd != null ? #dates.format(user.insurance.validityEnd, 'yyyy-MM-dd') : ''}"
+                                   class="form-control" 
+                                   required>
                         </div>
                     </div>
                 </div>
@@ -189,6 +190,70 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const today = new Date();
+
+            // 1. Define Global Limits (+/- 100 Years)
+            const minYear = today.getFullYear() - 100;
+            const maxYear = today.getFullYear() + 100;
+
+            const minGlobalDate = formatDate(new Date(minYear, today.getMonth(), today.getDate()));
+            const maxGlobalDate = formatDate(new Date(maxYear, today.getMonth(), today.getDate()));
+
+            // Helper function to format date YYYY-MM-DD
+            function formatDate(date) {
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                return `${yyyy}-${mm}-${dd}`;
+            }
+
+            // 2. Apply Global Limits to BOTH inputs initially
+            startDateInput.setAttribute('min', minGlobalDate);
+            startDateInput.setAttribute('max', maxGlobalDate);
+            
+            endDateInput.setAttribute('min', minGlobalDate);
+            endDateInput.setAttribute('max', maxGlobalDate);
+
+            // 3. Dynamic Logic: Start Date Change
+            startDateInput.addEventListener('change', function() {
+                const selectedStart = startDateInput.value;
+                if (selectedStart) {
+                    endDateInput.setAttribute('min', selectedStart);
+                    if (endDateInput.value && endDateInput.value < selectedStart) {
+                        endDateInput.value = '';
+                    }
+                } else {
+                    endDateInput.setAttribute('min', minGlobalDate);
+                }
+            });
+
+            // 4. Dynamic Logic: End Date Change
+            endDateInput.addEventListener('change', function() {
+                const selectedEnd = endDateInput.value;
+                if (selectedEnd) {
+                    startDateInput.setAttribute('max', selectedEnd);
+                    if (startDateInput.value && startDateInput.value > selectedEnd) {
+                        startDateInput.value = '';
+                    }
+                } else {
+                    startDateInput.setAttribute('max', maxGlobalDate);
+                }
+            });
+
+            // 5. Initial Run (for pre-filled forms)
+            if (startDateInput.value) {
+                endDateInput.setAttribute('min', startDateInput.value);
+            }
+            if (endDateInput.value) {
+                startDateInput.setAttribute('max', endDateInput.value);
+            }
+        });
+    </script>
 
 </body>
 </html>

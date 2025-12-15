@@ -54,6 +54,19 @@
             padding: 0.8rem 2rem; border: none; font-weight: 600; width: 100%; transition: all 0.2s;
         }
         .btn-update:hover { background: var(--primary-dark); transform: translateY(-2px); color: white; }
+
+        /* Style for the eye icon button */
+        .password-toggle {
+            cursor: pointer;
+            background-color: white; 
+            border: 1px solid #cbd5e1;
+            border-left: none;
+            border-radius: 0 10px 10px 0 !important;
+            color: #64748b;
+        }
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -79,7 +92,7 @@
                 <p class="text-secondary">Keep your personal information up to date.</p>
             </div>
             
-            <form th:action="@{/user/updateprofile}" th:object="${user}" method="post">
+            <form th:action="@{/user/updateprofile}" th:object="${user}" method="post" id="profileForm">
                 
                 <input type="hidden" th:field="*{id}">
                 <input type="hidden" th:field="*{role}"> 
@@ -92,15 +105,29 @@
                             <input type="text" th:field="*{username}" class="form-control" required>
                         </div>
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="text" th:field="*{password}" class="form-control" placeholder="New password (optional)">
+                            
+                            <input type="password" 
+                                   name="password"
+                                   th:value="${user.password}"
+                                   class="form-control" 
+                                   id="passwordInput" 
+                                   style="border-radius: 0; border-right: none;">
+                            
+                            <span class="input-group-text password-toggle" id="togglePassword">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </span>
                         </div>
-                        <small class="text-muted ms-2">Leave blank to keep current password.</small>
+                        
+                        <div id="passwordError" class="text-danger small mt-1" style="display:none;">
+                            <i class="fas fa-exclamation-circle me-1"></i> 
+                            Min 5 chars, letters & numbers required.
+                        </div>
                     </div>
-
                     <div class="col-md-6">
                         <label class="form-label">Age</label>
                         <div class="input-group">
@@ -147,6 +174,65 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 1. Toggle Password Visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const passwordInput = document.querySelector('#passwordInput');
+        const eyeIcon = document.querySelector('#eyeIcon');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye slash icon
+            if (type === 'text') {
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // 2. Validate Password Rules on Form Submit
+        const form = document.querySelector('#profileForm');
+        const errorMsg = document.querySelector('#passwordError');
+
+        form.addEventListener('submit', function (e) {
+            const password = passwordInput.value;
+
+            // Only validate if there is a password value present
+            if (password.length > 0) {
+                // Rule: At least 5 characters
+                const lengthCheck = password.length >= 5;
+                // Rule: Must contain at least one letter and one number
+                const mixCheck = /[a-zA-Z]/.test(password) && /\d/.test(password);
+
+                if (!lengthCheck || !mixCheck) {
+                    e.preventDefault(); // Stop form submission
+                    errorMsg.style.display = 'block'; // Show error message
+                    passwordInput.focus();
+                    
+                    // Highlight border to indicate error
+                    passwordInput.style.borderColor = '#dc3545';
+                    togglePassword.style.borderColor = '#dc3545';
+                } else {
+                    errorMsg.style.display = 'none';
+                    passwordInput.style.borderColor = '#cbd5e1';
+                    togglePassword.style.borderColor = '#cbd5e1';
+                }
+            }
+        });
+        
+        // Clear error when user starts typing
+        passwordInput.addEventListener('input', function() {
+            errorMsg.style.display = 'none';
+            passwordInput.style.borderColor = '#cbd5e1';
+            togglePassword.style.borderColor = '#cbd5e1';
+        });
+    </script>
 
 </body>
 </html>
